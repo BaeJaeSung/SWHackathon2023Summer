@@ -8,5 +8,34 @@
     <h1>Express</h1>
     <p>Welcome to Express</p>
     <a href="/getJSON">getJSON</a>
+
+    <br />
+
+    <form id="joinForm" action="/user/join" method="POST">
+      회원가입
+      <br />
+      <input type="text" name="id" id="id" placeholder="id" /><br />
+      <input type="text" name="pw" id="pw" placeholder="pw" /><br />
+      <input
+        type="text"
+        name="nickname"
+        id="nickname"
+        placeholder="nickname"
+      /><br />
+      <input type="text" name="type" id="type" placeholder="type" /><br />
+      <input type="text" name="age" id="age" placeholder="age" />
+
+      <button type="submit">join</button>
+    </form>
+
+    <hr />
+
+    <form id="loginForm" action="/user/login" method="POST">
+      로그인
+      <br />
+      <input type="text" name="id" id="id" placeholder="id" /><br />
+      <input type="text" name="pw" id="pw" placeholder="pw" />
+      <button type="submit">login</button>
+    </form>
   </body>
 </html>
