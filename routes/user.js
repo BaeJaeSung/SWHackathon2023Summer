@@ -174,6 +174,7 @@ router.post("/my_info", async (req, res, next) => {
                             FROM user, youth_profile AS profile
                             WHERE user.id = profile.uid AND user.id = '${id}';`;
 
+
     user = await new Promise((resolve, reject) => {
       db.query(getHikiInfoSQL, (err, res) => {
         if (err) throw err;
@@ -184,6 +185,7 @@ router.post("/my_info", async (req, res, next) => {
     });
 
     console.log("user", user);
+
 
     const getHikiCareerSQL = `SELECT * FROM user, youth_career WHERE user.id = youth_career.uid AND user.id = '${id}'`;
     const career = await new Promise((resolve, reject) => {
@@ -196,6 +198,7 @@ router.post("/my_info", async (req, res, next) => {
     let hiki = {};
     result = await new Promise((resolve) => {
       console.log(user);
+
 
       hiki.uid = user.uid;
       hiki.id = user.id;
@@ -217,6 +220,7 @@ router.post("/my_info", async (req, res, next) => {
         resolve(res[0]);
       });
     });
+
     const getCEOWorkSQL = `SELECT * FROM company_employment AS ceo_work WHERE ceo_work.uid = '${id}'`;
     console.log("for get ceo query", user.id);
     const works = await new Promise((resolve, reject) => {
@@ -226,8 +230,10 @@ router.post("/my_info", async (req, res, next) => {
         resolve(res);
       });
     });
+
     let ceo = {};
     result = await new Promise((resolve) => {
+
       ceo.uid = user.uid;
       ceo.id = user.id;
       ceo.nickname = user.nickname;
@@ -246,6 +252,7 @@ router.post("/my_info", async (req, res, next) => {
   }
 
   res.send(result);
+
 });
 
 // hiki register
