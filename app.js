@@ -14,6 +14,7 @@ const indexRouter = require("./routes/index");
 const userRouter = require("./routes/user");
 const matchRouter = require("./routes/match");
 const chatRouter = require("./routes/chat");
+const chatgptRouter = require("./routes/chatgpt");
 
 const app = express();
 
@@ -48,5 +49,6 @@ app.use("/", indexRouter);
 app.use("/user", userRouter);
 app.use("/match", matchRouter);
 app.use("/chat", chatRouter);
+app.use("/chatgpt", chatgptRouter);
 
 module.exports = app;
