@@ -1,6 +1,7 @@
 // match API
 const express = require("express");
 const db = require("../db");
+const { getMaxListeners } = require("../app");
 
 const router = express.Router();
 
@@ -134,7 +135,7 @@ router.post("/load_candidate_ceo", async (req, res, next) => {
     const result = await new Promise((resolve) => {
       ceo.id = user.id;
       ceo.name = user.name;
-      ceo.number = user.number;
+      ceo.phone_number = user.phone_number;
       ceo.intro = user.intro;
       ceo.employee_count = user.employee_count;
       // ceo.img_url;
@@ -199,10 +200,8 @@ router.post("/choice", async (req, res, next) => {
       if (err) throw err;
 
       if (res[0].hiki_choice === 1 && res[0].ceo_choice === 1) {
-        console.log("match!");
         resolve(true);
       } else {
-        console.log("don`t match!");
         resolve(false);
       }
     });
@@ -221,12 +220,85 @@ router.post("/received", async (req, res, next) => {
   const id = body.id;
   const type = body.type;
 
-  // if hiki
-
+  const likeList = [];
+  // if hiki(나)를 좋아하는 유저들
   if (parseInt(type) === 0) {
-    sql = `SELECT * FROM user, matching, youth_profile WHERE `;
+    const getHikiReceivedLikeSQL = `SELECT user.uid AS uid, matching.ceo_id AS id, ceo.name AS name, ceo.phone_number AS phone_number, ceo.intro AS intro, ceo.employee_count AS employee_count, ceo.type AS type, ceo.representative AS representative
+                          FROM user, matching, company_profile AS ceo
+                          WHERE user.id = matching.hiki_id AND matching.ceo_choice = 1 AND matching.hiki_choice = 0 AND user.id = '${id}'`;
+
+    const ceoLikeArr = await new Promise((resolve) => {
+      db.query(getHikiReceivedLikeSQL, (err, res) => {
+        if (err) throw err;
+        resolve(res);
+      });
+    });
+
+    console.log("ceoLikeArr", ceoLikeArr);
+
+    for (let user of ceoLikeArr) {
+      // add works field
+      const getCEOWorkSQL = `SELECT * FROM company_employment AS ceo_work WHERE ceo_work.uid = '${user.id}'`;
+      console.log("for get ceo query", user.id);
+
+      const works = await new Promise((resolve, reject) => {
+        db.query(getCEOWorkSQL, (err, res) => {
+          if (err) throw err;
+
+          console.log(res);
+          resolve(res);
+        });
+      });
+
+      let ceo = {};
+      ceo.id = user.id;
+      ceo.name = user.name;
+      ceo.phone_number = user.phone_number;
+      ceo.intro = user.intro;
+      ceo.employee_count = user.employee_count;
+      ceo.type = user.type;
+      ceo.representative = user.representative;
+      ceo.works = works;
+
+      likeList.push(ceo);
+    }
+
+    console.log(likeList);
   } else {
+    const getCeoReceivedLikeSQL = `SELECT hiki.uid AS uid, profile.uid AS id, hiki.nickname AS nickname, PROFILE.info AS info, PROFILE.study_career AS study_career
+    FROM user, matching, youth_profile AS PROFILE, user AS hiki
+    WHERE user.id = matching.ceo_id AND matching.ceo_choice = 0 AND matching.hiki_choice = 1 AND hiki.id = matching.hiki_id AND user.id = '${id}'`;
+
+    const hikiLikeArr = await new Promise((resolve) => {
+      db.query(getCeoReceivedLikeSQL, (err, res) => {
+        if (err) throw err;
+        resolve(res);
+      });
+    });
+
+    for (let user of hikiLikeArr) {
+      const getHikiCareerSQL = `SELECT career.pid AS pid, user.uid AS uid, career.company_name AS company_name, career.period AS period, career.experience AS experience
+        FROM user, youth_career AS career WHERE user.id = career.uid AND user.id = '${user.id}'`;
+      const careers = await new Promise((resolve) => {
+        db.query(getHikiCareerSQL, (err, res) => {
+          if (err) throw err;
+          resolve(res);
+        });
+      });
+
+      let hiki = {};
+      hiki.uid = user.uid;
+      hiki.id = user.id;
+      hiki.nickname = user.nickname;
+      hiki.info = user.info;
+      hiki.study_career = user.study_career;
+      hiki.careers = careers;
+
+      likeList.push(hiki);
+    }
   }
+
+  res.send(likeList);
 });
 
 module.exports = router;
