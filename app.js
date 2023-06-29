@@ -9,10 +9,11 @@ const session = require("express-session");
 
 // default
 const indexRouter = require("./routes/index");
-const usersRouter = require("./routes/users");
 
 // custom
 const userRouter = require("./routes/user");
+const matchRouter = require("./routes/match");
+const chatRouter = require("./routes/chat");
 
 const app = express();
 
@@ -42,9 +43,10 @@ app.use(
 
 // default
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
 
 // custom
 app.use("/user", userRouter);
+app.use("/match", matchRouter);
+app.use("/chat", chatRouter);
 
 module.exports = app;

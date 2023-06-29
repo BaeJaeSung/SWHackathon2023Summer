@@ -86,4 +86,101 @@ router.post("/login", async (req, res, next) => {
 //   return res.send("test");
 // });
 
+router.post("/upload_picture", async (req, res, next) => {
+  const body = req.body;
+
+  const id = body.id;
+  const num = body.num;
+
+  // upload picture
+
+  res.send(true);
+  res.send(false);
+});
+
+// hiki register profile text
+router.post("/register_profile_text", async (req, res, next) => {
+  const body = req.body;
+
+  const id = body.id;
+  const info = body.info;
+
+  const insertHikiProfileSQL = `INSERT INTO youth_profile(uid, info, study_career)`;
+  const success_flag = await new Promise((resolve) => {
+    db.query(insertHikiProfileSQL, (err) => {
+      if (err) resolve(false);
+      else resolve(true);
+    });
+  });
+
+  res.send(success_flag);
+});
+
+// hiki register study career
+router.post("/register_profile_study_career", async (req, res, next) => {
+  const body = req.body;
+
+  const id = body.id;
+  const study_career = body.study_career;
+
+  const insertHikiStudyCareerSQL = `UPDATE TABLE youth_profile`;
+});
+
+// hiki register career
+router.post("/register_career", async (req, res, next) => {
+  const body = req.body;
+
+  const id = body.id;
+  const company_name = body.company_name;
+  const period = bdoy.period;
+  const experience = body.experience;
+
+  const insertHikiCareerSQL = `INSERT INTO youth_career(uid, company_name, period, experience)
+                              VALUES('${id}', '${company_name}', '${period}', '${experience}')`;
+
+  const success_flag = await new Promise((resolve) => {
+    db.query(insertHikiCareerSQL, (err) => {
+      if (err) resolve(false);
+      else resolve(true);
+    });
+  });
+
+  res.send(success_flag);
+});
+
+// 내 정보 불러오기
+router.post("/my_info", async (req, res, next) => {
+  const body = req.body;
+
+  const id = body.id;
+  const type = body.type;
+
+  let user_info;
+  if (parseInt(type) === 0) {
+    const getHikiInfoSQL = `SELECT * FROM youth_profile`;
+
+    user_info = await new Promise((resolve, reject) => {
+      db.query(getHikiInfoSQL, (err, res) => {
+        if (err) throw err;
+
+        resolve(res);
+      });
+    });
+  } else {
+    const getCEOInfoSQL = `SELECT * FROM company_profile`;
+
+    user_info = await new Promise((resolve, reject) => {
+      db.query(getCEOInfoSQL, (err, res) => {
+        if (err) throw err;
+
+        resolve(res);
+      });
+    });
+  }
+
+  res.send(user_info);
+});
+
+// hiki register
+
 module.exports = router;
