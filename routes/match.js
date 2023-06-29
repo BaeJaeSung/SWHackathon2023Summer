@@ -21,7 +21,7 @@ router.post("/load_candidate_hiki", async (req, res, next) => {
   });
 
   for (let user of hikiInfo) {
-    let hiki = {};
+    
 
     // add career field
     const getHikiCareerSQL = `SELECT * FROM user, youth_career WHERE user.id = youth_career.uid AND user.id = '${user.id}'`;
@@ -33,6 +33,7 @@ router.post("/load_candidate_hiki", async (req, res, next) => {
       });
     });
 
+    let hiki = {};
     const result = await new Promise((resolve) => {
       hiki.uid = user.uid;
       hiki.id = user.id;
@@ -121,14 +122,14 @@ router.post("/choice", async (req, res, next) => {
     insertLikeSQL = `INSERT INTO matching(hiki_id, ceo_id, hiki_choice)
                             VALUES ('${id}', '${receiver_id}', ${choice})
                             ON DUPLICATE KEY UPDATE
-                            hiki_choice = VALUES(choice)`;
+                            hiki_choice = ${choice}`;
 
     checkMatchedSQL = `SELECT * FROM mathing WHERE hiki_id = '${id}'`;
   } else {
     insertLikeSQL = `INSERT INTO matching(hiki_id, ceo_id, ceo_choice)
                             VALUES ('${id}', '${receiver_id}', ${choice})
                             ON DUPLICATE KEY UPDATE
-                            ceo_choice = VALUES(choice)`;
+                            ceo_choice = ${choice}`;
 
     checkMatchedSQL = `SELECT * FROM mathing WHERE ceo_id = '${id}'`;
   }
