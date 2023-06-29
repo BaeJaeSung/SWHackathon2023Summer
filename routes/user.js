@@ -194,7 +194,7 @@ router.post("/my_info", async (req, res, next) => {
       hiki.age = user.age;
       hiki.info = user.info;
       hiki.study_career = user.study_career;
-      hiki.career = career;
+      hiki.careers = career;
 
       resolve(hiki);
     });
