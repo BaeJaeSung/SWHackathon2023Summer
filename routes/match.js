@@ -10,7 +10,7 @@ router.post("/load_candidate_hiki", async (req, res, next) => {
 
   const id = body.id; // 사업자 id
 
-  const getAllHikiSQL = `SELECT user.uid AS uid, user.id AS id, user.nickname AS nickname, profile.info AS info, profile.study_career AS study_career FROM user, youth_profile AS profile WHERE TYPE = 0 AND user.id = profile.uid ORDER BY RAND() LIMIT 10;`;
+  const getAllHikiSQL = `SELECT user.uid AS uid, user.id AS id, user.nickname AS nickname, profile.info AS info, profile.study_career AS study_career FROM user, youth_profile AS profile WHERE user.type = 0 AND user.id = profile.uid ORDER BY RAND() LIMIT 10;`;
 
   const hikis = [];
   const hikiInfo = await new Promise((resolve, reject) => {
@@ -82,7 +82,7 @@ router.post("/load_candidate_ceo", async (req, res, next) => {
 
   const id = body.id; // 히키 id
 
-  const getAllCEOSQL = `SELECT user.id AS id, ceo.name AS name, ceo.number AS number, ceo.intro AS intro, ceo.employee_count AS employee_count, ceo.type AS type, ceo.representative AS representative FROM user, company_profile AS ceo WHERE user.id = ceo.uid ORDER BY RAND() LIMIT 10;`;
+  const getAllCEOSQL = `SELECT user.id AS id, ceo.name AS name, ceo.number AS number, ceo.intro AS intro, ceo.employee_count AS employee_count, ceo.type AS type, ceo.representative AS representative FROM user, company_profile AS ceo WHERE user.type = 1 AND user.id = ceo.uid ORDER BY RAND() LIMIT 10;`;
 
   const ceos = [];
   const ceoInfo = await new Promise((resolve, reject) => {
