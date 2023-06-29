@@ -156,69 +156,36 @@ router.post("/register_career", async (req, res, next) => {
   });
 });
 
-// 내 정보 불러오기 (보류)
-// user, profile, career 다 가져와야함
-// router.post("/my_info", async (req, res, next) => {
-//   const body = req.body;
-
-//   const id = body.id;
-//   const type = await new Promise((resolve) => {
-//     db.query(`SELECT type FROM user WHERE id = '${id}'`, (err, res) => {
-//       if (err) throw err;
-//       resolve(parseInt(res[0].type));
-//     });
-//   });
-
-//   let user_info;
-//   if (parseInt(type) === 0) {
-//     const getHikiInfoSQL = `SELECT user.uid AS uid, user.id AS id, user.nickname AS nickname, user.type AS type, user.age AS age, profile.info AS info, profile.study_career AS study_career
-//                             FROM user, youth_profile AS profile
-//                             WHERE user.id = profile.uid AND user.id = '${id}'`;
-
-//     user_info = await new Promise((resolve, reject) => {
-//       db.query(getHikiInfoSQL, (err, res) => {
-//         if (err) throw err;
-
-//         resolve(res);
-//       });
-//     });
-
-//     const career = await new Promise((resolve) => {
-//       db.query(`SELECT * FROM youth_career WHERE uid = '${id}'`, (err, res) => {
-//         if(err) throw
-//       })
-//     })
-
-//   } else {
-//     const getCEOInfoSQL = `SELECT * FROM company_profile WHERE uid = '${id}'`;
-
-//     user_info = await new Promise((resolve, reject) => {
-//       db.query(getCEOInfoSQL, (err, res) => {
-//         if (err) throw err;
-
-//         resolve(res);
-//       });
-//     });
-//   }
-
-//   res.send(user_info);
-// });
-
 router.post("/my_info", async (req, res, next) => {
   const body = req.body;
   const id = body.id;
-  const type = body.type;
+  const type = await new Promise((resolve) => {
+    db.query(`SELECT type FROM user WHERE id = '${id}'`, (err, res) => {
+      if (err) throw err;
+
+      resolve(parseInt(res[0].type));
+    });
+  });
 
   let user;
+  let result;
   if (parseInt(type) === 0) {
-    const getHikiInfoSQL = `SELECT user.uid AS uid, user.id AS id, user.nickname AS nickname, user.type AS type, user.age AS age, profile.info AS info, profile.study_career AS study_career, FROM user, youth_profile AS profile WHERE user.id = profile.uid;`;
+    const getHikiInfoSQL = `SELECT user.uid AS uid, user.id AS id, user.nickname AS nickname, user.type AS type, user.age AS age, profile.info AS info, profile.study_career AS study_career
+                            FROM user, youth_profile AS profile
+                            WHERE user.id = profile.uid AND user.id = '${id}';`;
+
 
     user = await new Promise((resolve, reject) => {
       db.query(getHikiInfoSQL, (err, res) => {
         if (err) throw err;
-        resolve(res);
+
+        console.log(res[0]);
+        resolve(res[0]);
       });
     });
+
+    console.log("user", user);
+
 
     const getHikiCareerSQL = `SELECT * FROM user, youth_career WHERE user.id = youth_career.uid AND user.id = '${id}'`;
     const career = await new Promise((resolve, reject) => {
@@ -229,7 +196,10 @@ router.post("/my_info", async (req, res, next) => {
     });
 
     let hiki = {};
-    const result = await new Promise((resolve) => {
+    result = await new Promise((resolve) => {
+      console.log(user);
+
+
       hiki.uid = user.uid;
       hiki.id = user.id;
       hiki.nickname = user.nickname;
@@ -238,18 +208,16 @@ router.post("/my_info", async (req, res, next) => {
       hiki.info = user.info;
       hiki.study_career = user.study_career;
       hiki.careers = career;
-
       resolve(hiki);
     });
-
-
   } else {
-    const getCEOInfoSQL = `SELECT user.uid AS uid, user.id AS id, user.nickname AS nickname, user.type AS type, user.age AS age, profile.name AS name, profile.phone_number AS phone_number, profile.intro AS intro, profile.employee_count AS employee_count, profile.type AS company_type, profile.representative AS representative FROM user, company_profile AS profile WHERE user.id = profile.uid;`;
-
+    const getCEOInfoSQL = `SELECT user.uid AS uid, user.id AS id, user.nickname AS nickname, user.type AS type, user.age AS age, profile.name AS name, profile.phone_number AS phone_number, profile.intro AS intro, profile.employee_count AS employee_count, profile.type AS company_type, profile.representative AS representative
+                            FROM user, company_profile AS profile
+                            WHERE user.id = profile.uid AND user.id = '${id}';`;
     user = await new Promise((resolve, reject) => {
       db.query(getCEOInfoSQL, (err, res) => {
         if (err) throw err;
-        resolve(res);
+        resolve(res[0]);
       });
     });
 
@@ -264,7 +232,8 @@ router.post("/my_info", async (req, res, next) => {
     });
 
     let ceo = {};
-    const result = await new Promise((resolve) => {
+    result = await new Promise((resolve) => {
+
       ceo.uid = user.uid;
       ceo.id = user.id;
       ceo.nickname = user.nickname;
@@ -278,11 +247,12 @@ router.post("/my_info", async (req, res, next) => {
       ceo.company_type = user.company_type;
       ceo.representative = user.representative;
       ceo.works = works;
-
       resolve(ceo);
     });
   }
-  res.send(user_info);
+
+  res.send(result);
+
 });
 
 // hiki register
