@@ -77,6 +77,7 @@ router.post("/load_candidate_hiki", async (req, res, next) => {
 
 // 자영업자 목록 불러오기 (히키 사용 API)
 router.post("/load_candidate_ceo", async (req, res, next) => {
+
   const body = req.body;
 
   const id = body.id; // 히키 id
@@ -151,7 +152,7 @@ router.post("/load_candidate_ceo", async (req, res, next) => {
   res.send(ceos);
 });
 
-// Yes or No 선택
+// Yes or No 선택 - OK
 router.post("/choice", async (req, res, next) => {
   const body = req.body;
 
@@ -160,23 +161,29 @@ router.post("/choice", async (req, res, next) => {
   const receiver_id = body.receiver_id;
   const choice = body.choice;
 
+  console.log(id, type, receiver_id, choice);
+
   // if hiki
   let insertLikeSQL;
   let checkMatchedSQL;
   if (parseInt(type) === 0) {
     insertLikeSQL = `INSERT INTO matching(hiki_id, ceo_id, hiki_choice)
-                            VALUES ('${id}', '${receiver_id}', ${choice})
+                            VALUES ('${id}', '${receiver_id}', ${parseInt(
+      choice
+    )})
                             ON DUPLICATE KEY UPDATE
                             hiki_choice = ${choice}`;
 
-    checkMatchedSQL = `SELECT * FROM mathing WHERE hiki_id = '${id}'`;
+    checkMatchedSQL = `SELECT * FROM matching WHERE hiki_id = '${id}'`;
   } else {
     insertLikeSQL = `INSERT INTO matching(hiki_id, ceo_id, ceo_choice)
-                            VALUES ('${id}', '${receiver_id}', ${choice})
+                            VALUES ('${receiver_id}', '${id}', ${parseInt(
+      choice
+    )})
                             ON DUPLICATE KEY UPDATE
                             ceo_choice = ${choice}`;
 
-    checkMatchedSQL = `SELECT * FROM mathing WHERE ceo_id = '${id}'`;
+    checkMatchedSQL = `SELECT * FROM matching WHERE ceo_id = '${id}'`;
   }
 
   const result = await new Promise((resolve) => {
@@ -191,9 +198,11 @@ router.post("/choice", async (req, res, next) => {
     db.query(checkMatchedSQL, (err, res) => {
       if (err) throw err;
 
-      if (res.hiki_choice === 1 && res.hiki_choice === 1) {
+      if (res[0].hiki_choice === 1 && res[0].ceo_choice === 1) {
+        console.log("match!");
         resolve(true);
       } else {
+        console.log("don`t match!");
         resolve(false);
       }
     });
@@ -205,6 +214,7 @@ router.post("/choice", async (req, res, next) => {
   });
 });
 
+// 나를 좋아하는데 내가 아직 발견못한 유저들 (상대 -> 나 : 1 // 나 -> 상대 : 0)
 router.post("/received", async (req, res, next) => {
   const body = req.body;
 
@@ -212,8 +222,10 @@ router.post("/received", async (req, res, next) => {
   const type = body.type;
 
   // if hiki
+
   if (parseInt(type) === 0) {
     sql = `SELECT * FROM user, matching, youth_profile WHERE `;
+  } else {
   }
 });
 
