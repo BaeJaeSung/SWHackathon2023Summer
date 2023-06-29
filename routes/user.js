@@ -208,15 +208,18 @@ router.post("/my_info", async (req, res, next) => {
   const body = req.body;
   const id = body.id;
   const type = body.type;
+
   let user;
   if (parseInt(type) === 0) {
     const getHikiInfoSQL = `SELECT user.uid AS uid, user.id AS id, user.nickname AS nickname, user.type AS type, user.age AS age, profile.info AS info, profile.study_career AS study_career, FROM user, youth_profile AS profile WHERE user.id = profile.uid;`;
+
     user = await new Promise((resolve, reject) => {
       db.query(getHikiInfoSQL, (err, res) => {
         if (err) throw err;
         resolve(res);
       });
     });
+
     const getHikiCareerSQL = `SELECT * FROM user, youth_career WHERE user.id = youth_career.uid AND user.id = '${id}'`;
     const career = await new Promise((resolve, reject) => {
       db.query(getHikiCareerSQL, (err, res) => {
@@ -224,6 +227,7 @@ router.post("/my_info", async (req, res, next) => {
         resolve(res);
       });
     });
+
     let hiki = {};
     const result = await new Promise((resolve) => {
       hiki.uid = user.uid;
@@ -234,16 +238,21 @@ router.post("/my_info", async (req, res, next) => {
       hiki.info = user.info;
       hiki.study_career = user.study_career;
       hiki.careers = career;
+
       resolve(hiki);
     });
+
+
   } else {
     const getCEOInfoSQL = `SELECT user.uid AS uid, user.id AS id, user.nickname AS nickname, user.type AS type, user.age AS age, profile.name AS name, profile.phone_number AS phone_number, profile.intro AS intro, profile.employee_count AS employee_count, profile.type AS company_type, profile.representative AS representative FROM user, company_profile AS profile WHERE user.id = profile.uid;`;
+
     user = await new Promise((resolve, reject) => {
       db.query(getCEOInfoSQL, (err, res) => {
         if (err) throw err;
         resolve(res);
       });
     });
+
     const getCEOWorkSQL = `SELECT * FROM company_employment AS ceo_work WHERE ceo_work.uid = '${id}'`;
     console.log("for get ceo query", user.id);
     const works = await new Promise((resolve, reject) => {
@@ -253,6 +262,7 @@ router.post("/my_info", async (req, res, next) => {
         resolve(res);
       });
     });
+
     let ceo = {};
     const result = await new Promise((resolve) => {
       ceo.uid = user.uid;
@@ -268,6 +278,7 @@ router.post("/my_info", async (req, res, next) => {
       ceo.company_type = user.company_type;
       ceo.representative = user.representative;
       ceo.works = works;
+
       resolve(ceo);
     });
   }
