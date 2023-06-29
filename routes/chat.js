@@ -170,14 +170,15 @@ router.post("/send", async (req, res, next) => {
     }
   });
 
+  const date = new Date().toISOString().slice(0, 19).replace("T", " ");
   const success_flag = await new Promise((resolve) => {
     let insertChatSQL;
     if (parseInt(type) === 0) {
-      insertChatSQL = `INSERT INTO chat_contents(chat_id, message, hiki_id, ceo_id, sender)
-                        VALUES('${chat_id}', '${msg}', '${id}', '${receiver_id}', 0)`;
+      insertChatSQL = `INSERT INTO chat_contents(chat_id, message, sendtime, hiki_id, ceo_id, sender)
+                        VALUES('${chat_id}', '${msg}', '${date}', '${id}', '${receiver_id}', 0)`;
     } else {
-      insertChatSQL = `INSERT INTO chat_contents(chat_id, message, hiki_id, ceo_id, sender)
-                        VALUES('${chat_id}', '${msg}', '${receiver_id}', '${id}', 1)`;
+      insertChatSQL = `INSERT INTO chat_contents(chat_id, message, sendtime, hiki_id, ceo_id, sender)
+                        VALUES('${chat_id}', '${msg}', '${date}', '${receiver_id}', '${id}', 1)`;
     }
 
     db.query(insertChatSQL, (err, res) => {
@@ -188,6 +189,7 @@ router.post("/send", async (req, res, next) => {
 
   res.json({
     success: success_flag,
+    sendtime: date,
   });
 });
 
