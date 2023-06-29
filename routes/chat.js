@@ -84,6 +84,7 @@ router.post("/chat_list", async (req, res, next) => {
     chat.recent_msg = recent_msg;
   }
 
+
   res.send(chatList);
 });
 
@@ -98,6 +99,7 @@ router.post("/contents", async (req, res, next) => {
                               ORDER BY sendtime`;
 
   const contents = await new Promise((resolve, reject) => {
+
     db.query(getChatContentsSQL, (err, res) => {
       if (err) {
         throw err;
@@ -106,6 +108,7 @@ router.post("/contents", async (req, res, next) => {
       resolve(res);
     });
   });
+
 
   let hiki_name;
   let ceo_name;
@@ -189,5 +192,6 @@ router.post("/send", async (req, res, next) => {
     sendtime: date,
   });
 });
+
 
 module.exports = router;
