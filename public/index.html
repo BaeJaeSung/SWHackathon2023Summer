@@ -10,6 +10,7 @@
     <a href="/getJSON">getJSON</a>
 
     <br />
+    <!-- USER ROUTER TEST
 
     <form id="joinForm" action="/user/join" method="POST">
       회원가입
@@ -36,6 +37,48 @@
       <input type="text" name="id" id="id" placeholder="id" /><br />
       <input type="text" name="pw" id="pw" placeholder="pw" />
       <button type="submit">login</button>
+    </form> -->
+
+    <!-- MATCH ROUTER TEST -->
+    <form id="getHikiForm" action="/match/load_candidate_hiki" method="POST">
+      히키코모리 리스트 불러오기<br />
+      <button type="submit">get hiki list</button>
     </form>
+
+    <form id="getCEOForm" action="/match/load_candidate_ceo" method="POST">
+      자영업자 리스트 불러오기<br />
+      <button type="submit">get ceo list</button>
+    </form>
+
+    <form id="likeForm" action="/match/choice" method="POST">
+      좋아요 누르기<br />
+      <input id="id" name="id" placeholder="id" /><br />
+      <input id="id" name="id" placeholder="id" /><br />
+      <input id="id" name="id" placeholder="id" /><br />
+      <button type="submit">like! (ceo to hiki)</button>
+    </form>
+    <hr />
+
+    <!-- CHAT ROUTER TEST
+    
+      <form id="chatForm" action="/chat/chat_list" method="POST">
+      채팅 리스트
+      <br />
+      <input type="text" name="id" id="id" placeholder="id" /><br />
+      <input type="text" name="type" id="type" placeholder="type" />
+      <button type="submit">get chat list</button>
+    </form>
+
+    <form id="chatContentsForm" action="/chat/contents" method="POST">
+      채팅 내용
+      <br />
+      <input
+        type="text"
+        name="chat_id"
+        id="chat_id"
+        placeholder="chat_id"
+      /><br />
+      <button type="submit">get chat list contents</button>
+    </form> -->
   </body>
 </html>
