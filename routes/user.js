@@ -34,8 +34,6 @@ router.post("/join", async (req, res, next) => {
 
   res.json({
     success: join_flag,
-    id: id,
-    nickname: nickname,
   });
 });
 
@@ -71,8 +69,6 @@ router.post("/login", async (req, res, next) => {
   console.log("login_flag", login_flag);
   res.json({
     success: login_flag,
-    id: id,
-    nickname: nickname,
   });
 });
 
