@@ -158,35 +158,119 @@ router.post("/register_career", async (req, res, next) => {
 
 // 내 정보 불러오기 (보류)
 // user, profile, career 다 가져와야함
+// router.post("/my_info", async (req, res, next) => {
+//   const body = req.body;
+
+//   const id = body.id;
+//   const type = await new Promise((resolve) => {
+//     db.query(`SELECT type FROM user WHERE id = '${id}'`, (err, res) => {
+//       if (err) throw err;
+//       resolve(parseInt(res[0].type));
+//     });
+//   });
+
+//   let user_info;
+//   if (parseInt(type) === 0) {
+//     const getHikiInfoSQL = `SELECT user.uid AS uid, user.id AS id, user.nickname AS nickname, user.type AS type, user.age AS age, profile.info AS info, profile.study_career AS study_career
+//                             FROM user, youth_profile AS profile
+//                             WHERE user.id = profile.uid AND user.id = '${id}'`;
+
+//     user_info = await new Promise((resolve, reject) => {
+//       db.query(getHikiInfoSQL, (err, res) => {
+//         if (err) throw err;
+
+//         resolve(res);
+//       });
+//     });
+
+//     const career = await new Promise((resolve) => {
+//       db.query(`SELECT * FROM youth_career WHERE uid = '${id}'`, (err, res) => {
+//         if(err) throw
+//       })
+//     })
+
+//   } else {
+//     const getCEOInfoSQL = `SELECT * FROM company_profile WHERE uid = '${id}'`;
+
+//     user_info = await new Promise((resolve, reject) => {
+//       db.query(getCEOInfoSQL, (err, res) => {
+//         if (err) throw err;
+
+//         resolve(res);
+//       });
+//     });
+//   }
+
+//   res.send(user_info);
+// });
+
 router.post("/my_info", async (req, res, next) => {
   const body = req.body;
-
   const id = body.id;
   const type = body.type;
-
-  let user_info;
+  let user;
   if (parseInt(type) === 0) {
-    const getHikiInfoSQL = `SELECT * FROM youth_profile`;
-
-    user_info = await new Promise((resolve, reject) => {
+    const getHikiInfoSQL = `SELECT user.uid AS uid, user.id AS id, user.nickname AS nickname, user.type AS type, user.age AS age, profile.info AS info, profile.study_career AS study_career, FROM user, youth_profile AS profile WHERE user.id = profile.uid;`;
+    user = await new Promise((resolve, reject) => {
       db.query(getHikiInfoSQL, (err, res) => {
         if (err) throw err;
-
         resolve(res);
       });
+    });
+    const getHikiCareerSQL = `SELECT * FROM user, youth_career WHERE user.id = youth_career.uid AND user.id = '${id}'`;
+    const career = await new Promise((resolve, reject) => {
+      db.query(getHikiCareerSQL, (err, res) => {
+        if (err) throw err;
+        resolve(res);
+      });
+    });
+    let hiki = {};
+    const result = await new Promise((resolve) => {
+      hiki.uid = user.uid;
+      hiki.id = user.id;
+      hiki.nickname = user.nickname;
+      hiki.type = user.type;
+      hiki.age = user.age;
+      hiki.info = user.info;
+      hiki.study_career = user.study_career;
+      hiki.careers = career;
+      resolve(hiki);
     });
   } else {
-    const getCEOInfoSQL = `SELECT * FROM company_profile`;
-
-    user_info = await new Promise((resolve, reject) => {
+    const getCEOInfoSQL = `SELECT user.uid AS uid, user.id AS id, user.nickname AS nickname, user.type AS type, user.age AS age, profile.name AS name, profile.phone_number AS phone_number, profile.intro AS intro, profile.employee_count AS employee_count, profile.type AS company_type, profile.representative AS representative FROM user, company_profile AS profile WHERE user.id = profile.uid;`;
+    user = await new Promise((resolve, reject) => {
       db.query(getCEOInfoSQL, (err, res) => {
         if (err) throw err;
-
         resolve(res);
       });
     });
+    const getCEOWorkSQL = `SELECT * FROM company_employment AS ceo_work WHERE ceo_work.uid = '${id}'`;
+    console.log("for get ceo query", user.id);
+    const works = await new Promise((resolve, reject) => {
+      db.query(getCEOWorkSQL, (err, res) => {
+        if (err) throw err;
+        console.log(res);
+        resolve(res);
+      });
+    });
+    let ceo = {};
+    const result = await new Promise((resolve) => {
+      ceo.uid = user.uid;
+      ceo.id = user.id;
+      ceo.nickname = user.nickname;
+      ceo.type = user.type;
+      ceo.age = user.age;
+      ceo.name = user.name; // 회사 이름
+      ceo.phone_number = user.phone_number;
+      ceo.intro = user.intro;
+      ceo.employee_count = user.employee_count;
+      // ceo.img_url;
+      ceo.company_type = user.company_type;
+      ceo.representative = user.representative;
+      ceo.works = works;
+      resolve(ceo);
+    });
   }
-
   res.send(user_info);
 });
 

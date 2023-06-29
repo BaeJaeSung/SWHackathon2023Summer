@@ -32,7 +32,7 @@ router.post("/chat_list", async (req, res, next) => {
 
     console.log("type == 0", chatList);
   } else {
-    const getChatListSQL = `SELECT * FROM chat_info WHERE ceo_id = ${id}`;
+    const getChatListSQL = `SELECT * FROM chat_info WHERE ceo_id = '${id}'`;
 
     chatList = await new Promise((resolve, reject) => {
       db.query(getChatListSQL, (err, res) => {

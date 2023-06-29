@@ -7,7 +7,7 @@ const router = express.Router();
 
 // hiki 목록 불러오기 (자영업자 사용 API)
 router.post("/load_candidate_hiki", async (req, res, next) => {
-  const getAllHikiSQL = `SELECT user.uid AS uid, user.id AS id, user.nickname AS nickname, profile.info AS info, profile.study_career AS study_career FROM user, youth_profile AS profile WHERE TYPE = 0 AND user.id = profile.uid`;
+  const getAllHikiSQL = `SELECT user.uid AS uid, user.id AS id, user.nickname AS nickname, user.age AS age, profile.info AS info, profile.study_career AS study_career FROM user, youth_profile AS profile WHERE TYPE = 0 AND user.id = profile.uid`;
 
   const hikis = [];
   const hikiInfo = await new Promise((resolve, reject) => {
@@ -37,6 +37,7 @@ router.post("/load_candidate_hiki", async (req, res, next) => {
       hiki.uid = user.uid;
       hiki.id = user.id;
       hiki.nickname = user.nickname;
+      hiki.age = user.age;
       hiki.info = user.info;
       hiki.study_career = user.study_career;
       // hiki.images;
@@ -150,6 +151,8 @@ router.post("/choice", async (req, res, next) => {
   const is_matched = await new Promise((resolve) => {
     db.query(checkMatchedSQL, (err, res) => {
       if (err) throw err;
+
+      console.log(res[0]);
 
       if (res[0].hiki_choice === 1 && res[0].ceo_choice === 1) {
         resolve(true);
