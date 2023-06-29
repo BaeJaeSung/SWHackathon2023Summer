@@ -5,7 +5,7 @@ const db = require("../db");
 const router = express.Router();
 
 /* GET home page. */
-// user/join :: 회원가입 기능
+// user/join :: 회원가입 기능 - OK
 router.post("/join", async (req, res, next) => {
   const body = req.body;
 
@@ -32,18 +32,14 @@ router.post("/join", async (req, res, next) => {
     });
   });
 
-  // success
-  if (await join_flag) {
-    return res.send(true);
-  } // failed
-  else {
-    return res.send(false);
-  }
-
-  // res.render("login", { title: "Express" });
+  res.json({
+    success: join_flag,
+    id: id,
+    nickname: nickname,
+  });
 });
 
-// user/login :: 로그인 기능
+// user/login :: 로그인 기능 - OK
 router.post("/login", async (req, res, next) => {
   const body = req.body;
 
@@ -73,12 +69,11 @@ router.post("/login", async (req, res, next) => {
   });
 
   console.log("login_flag", login_flag);
-
-  if (login_flag) {
-    res.send(true);
-  } else {
-    res.send(false);
-  }
+  res.json({
+    success: login_flag,
+    id: id,
+    nickname: nickname,
+  });
 });
 
 // user/logout :: 로그아웃 기능
@@ -86,26 +81,27 @@ router.post("/login", async (req, res, next) => {
 //   return res.send("test");
 // });
 
-router.post("/upload_picture", async (req, res, next) => {
-  const body = req.body;
+// img upload 보류
+// router.post("/upload_picture", async (req, res, next) => {
+//   const body = req.body;
 
-  const id = body.id;
-  const num = body.num;
+//   const id = body.id;
+//   const num = body.num;
 
-  // upload picture
+//   // upload picture
 
-  res.send(true);
-  res.send(false);
-});
+//   res.send(true);
+//   res.send(false);
+// });
 
-// hiki register profile text
+// hiki register profile text - OK
 router.post("/register_profile_text", async (req, res, next) => {
   const body = req.body;
 
   const id = body.id;
   const info = body.info;
 
-  const insertHikiProfileSQL = `INSERT INTO youth_profile(uid, info, study_career)`;
+  const insertHikiProfileSQL = `INSERT INTO youth_profile(uid, info) VALUES('${id}', '${info}') ON DUPLICATE KEY UPDATE info = '${info}'`;
   const success_flag = await new Promise((resolve) => {
     db.query(insertHikiProfileSQL, (err) => {
       if (err) resolve(false);
@@ -113,26 +109,40 @@ router.post("/register_profile_text", async (req, res, next) => {
     });
   });
 
-  res.send(success_flag);
+  res.json({
+    success: success_flag,
+  });
 });
 
-// hiki register study career
+// hiki register study career - OK
 router.post("/register_profile_study_career", async (req, res, next) => {
   const body = req.body;
 
   const id = body.id;
   const study_career = body.study_career;
 
-  const insertHikiStudyCareerSQL = `UPDATE TABLE youth_profile`;
+  const insertHikiStudyCareerSQL = `INSERT INTO youth_profile(uid, study_career) VALUES('${id}', '${study_career}')
+                                    ON DUPLICATE KEY UPDATE study_career = '${study_career}'`;
+
+  const success_flag = await new Promise((resolve) => {
+    db.query(insertHikiStudyCareerSQL, (err, res) => {
+      if (err) resolve(false);
+      else resolve(true);
+    });
+  });
+
+  res.json({
+    success: success_flag,
+  });
 });
 
-// hiki register career
+// hiki register career - OK
 router.post("/register_career", async (req, res, next) => {
   const body = req.body;
 
   const id = body.id;
   const company_name = body.company_name;
-  const period = bdoy.period;
+  const period = body.period;
   const experience = body.experience;
 
   const insertHikiCareerSQL = `INSERT INTO youth_career(uid, company_name, period, experience)
@@ -145,10 +155,13 @@ router.post("/register_career", async (req, res, next) => {
     });
   });
 
-  res.send(success_flag);
+  res.json({
+    success: success_flag,
+  });
 });
 
-// 내 정보 불러오기
+// 내 정보 불러오기 (보류)
+// user, profile, career 다 가져와야함
 router.post("/my_info", async (req, res, next) => {
   const body = req.body;
 
